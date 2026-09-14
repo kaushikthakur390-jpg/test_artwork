@@ -25,7 +25,7 @@ export default function SculpturePage() {
 
         {/* Left/Top Area - 3D Viewer with built-in AR */}
         <div className="w-full md:w-2/3 h-[60vh] md:h-screen relative border-r border-charcoal/10">
-          <SculptureViewer modelUrl={artwork.modelUrl!} />
+          <SculptureViewer modelUrl={artwork.modelUrl!} iosSrc={artwork.iosSrc} />
         </div>
 
         {/* Right/Bottom Area - Metadata */}

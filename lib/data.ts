@@ -11,6 +11,7 @@ export interface Artwork {
   description: string;
   // Specific to sculpture
   modelUrl?: string;
+  iosSrc?: string;
   // Specific to painting
   imageUrl?: string;
 }
@@ -25,6 +26,7 @@ export const artworks: Artwork[] = [
     medium: "Bronze",
     dimensions: "82 × 41 × 38 cm",
     modelUrl: "/models/sculpture.glb",
+    iosSrc: "/models/sculpture.usdz",
     description: "A meditation on balance and form, Untitled I explores the tension between organic growth and rigid structure. The dark bronze surface catches light softly, inviting tactile exploration."
   },
   {

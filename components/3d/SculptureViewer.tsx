@@ -6,9 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 
 interface SculptureViewerProps {
   modelUrl: string;
+  iosSrc?: string;
 }
 
-export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
+export function SculptureViewer({ modelUrl, iosSrc }: SculptureViewerProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [interacted, setInteracted] = useState(false);
   const viewerRef = useRef<HTMLDivElement>(null);
@@ -39,6 +40,7 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
     >
       <ModelViewer
         src={modelUrl}
+        ios-src={iosSrc}
         ar="true"
         ar-modes="webxr scene-viewer quick-look"
         camera-controls="true"
