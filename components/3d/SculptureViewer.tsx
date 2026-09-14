@@ -2,7 +2,7 @@
 
 import { Suspense, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment, ContactShadows, Html, useProgress, Bounds, Center } from "@react-three/drei";
+import { OrbitControls, useGLTF, Environment, ContactShadows, Html, useProgress } from "@react-three/drei";
 import * as THREE from "three";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
@@ -25,6 +25,35 @@ function Model({ url }: { url: string }) {
   const { scene } = useGLTF(url);
   const group = useRef<THREE.Group>(null);
   
+  useEffect(() => {
+    if (scene) {
+      // 1. Calculate original bounding box
+      const box = new THREE.Box3().setFromObject(scene);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      
+      // 2. Center the object around 0,0,0
+      scene.position.x = -center.x;
+      scene.position.y = -center.y;
+      scene.position.z = -center.z;
+      
+      // 3. Scale to fit within a 3x3x3 bounding volume (standardizing size)
+      const maxDim = Math.max(size.x, size.y, size.z);
+      if (maxDim > 0) {
+        scene.scale.setScalar(3 / maxDim);
+      }
+      
+      // 4. Update matrices
+      scene.updateMatrixWorld();
+      
+      // 5. Recompute bounding box after scaling and centering
+      const newBox = new THREE.Box3().setFromObject(scene);
+      
+      // 6. Move it up so its bottom sits exactly on the floor (Y=0)
+      scene.position.y -= newBox.min.y;
+    }
+  }, [scene]);
+
   // Very slow continuous rotation for presentation
   useFrame(() => {
     if (group.current) {
@@ -77,11 +106,7 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
         />
         
         <Suspense fallback={<Loader />}>
-          <Bounds fit clip margin={1.2}>
-            <Center bottom>
-              <Model url={modelUrl} />
-            </Center>
-          </Bounds>
+          <Model url={modelUrl} />
           
           <Environment preset="studio" />
           
