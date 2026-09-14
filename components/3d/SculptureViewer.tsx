@@ -77,7 +77,7 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
         />
         
         <Suspense fallback={<Loader />}>
-          <Bounds fit clip observe margin={1.2}>
+          <Bounds fit clip margin={1.2}>
             <Center bottom>
               <Model url={modelUrl} />
             </Center>
