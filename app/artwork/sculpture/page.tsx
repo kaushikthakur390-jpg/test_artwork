@@ -27,11 +27,9 @@ export default function SculpturePage() {
         {/* Left/Top Area - 3D Viewer (Dominant) */}
         <div className="w-full md:w-2/3 h-[60vh] md:h-screen relative border-r border-charcoal/10">
           <SculptureViewer modelUrl={artwork.modelUrl!} />
-          {/* AR Fallback / Secondary Viewer for Mobile/AR Support */}
-          <div className="absolute inset-0 pointer-events-none z-10 flex items-end justify-center pb-6 md:pb-12">
-             <div className="pointer-events-auto">
-                <ModelViewerAR modelUrl={artwork.modelUrl!} />
-             </div>
+          {/* AR Button - positioned at bottom center, does NOT overlay the canvas */}
+          <div className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 z-10">
+            <ModelViewerAR modelUrl={artwork.modelUrl!} />
           </div>
         </div>
 
