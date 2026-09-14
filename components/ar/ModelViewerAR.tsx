@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Box } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,29 +26,23 @@ export function ModelViewerAR({ modelUrl, className }: ModelViewerARProps) {
 
   const ModelViewer = 'model-viewer' as any;
 
-  const handleARClick = () => {
-    if (viewerRef.current && viewerRef.current.activateAR) {
-      viewerRef.current.activateAR();
-    }
-  };
-
   return (
     <div className={cn("absolute inset-0 pointer-events-none flex items-end justify-center pb-6 md:pb-12 z-20", className)}>
       <ModelViewer
-        ref={viewerRef}
         src={modelUrl}
         ar="true"
         ar-modes="webxr scene-viewer quick-look"
         reveal="manual"
-        style={{ display: 'none' }}
-      />
-      <button
-        onClick={handleARClick}
-        className="pointer-events-auto bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors flex items-center space-x-3 shadow-lg"
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', backgroundColor: 'transparent' }}
       >
-        <Box size={16} strokeWidth={1.5} />
-        <span>View in my space</span>
-      </button>
+        <button
+          slot="ar-button"
+          className="pointer-events-auto bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors flex items-center space-x-3 shadow-lg cursor-pointer"
+        >
+          <Box size={16} strokeWidth={1.5} />
+          <span>View in my space</span>
+        </button>
+      </ModelViewer>
     </div>
   );
 }
