@@ -13,8 +13,6 @@ interface ModelViewerARProps {
 export function ModelViewerAR({ modelUrl, className }: ModelViewerARProps) {
   const [isMounted, setIsMounted] = useState(false);
 
-  const viewerRef = useRef<any>(null);
-
   useEffect(() => {
     // Dynamically import model-viewer only on client side
     import("@google/model-viewer").then(() => {
