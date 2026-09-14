@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Box } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,12 +11,22 @@ interface SculptureViewerProps {
 export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [interacted, setInteracted] = useState(false);
+  const viewerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     import("@google/model-viewer").then(() => {
       setIsMounted(true);
     });
   }, []);
+
+  const handleAR = () => {
+    if (viewerRef.current) {
+      const mv = viewerRef.current.querySelector("model-viewer") as any;
+      if (mv?.activateAR) {
+        mv.activateAR();
+      }
+    }
+  };
 
   if (!isMounted) {
     return (
@@ -32,6 +42,7 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
 
   return (
     <div
+      ref={viewerRef}
       className="relative w-full h-full bg-offwhite"
       onPointerDown={() => setInteracted(true)}
     >
@@ -55,16 +66,16 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
           "--poster-color": "transparent",
         }}
         alt="A 3D model of an artwork"
+      />
+
+      {/* AR button — always visible, triggers AR programmatically */}
+      <button
+        onClick={handleAR}
+        className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors flex items-center space-x-3 shadow-lg cursor-pointer z-10"
       >
-        {/* AR button — only shows on AR-capable devices */}
-        <button
-          slot="ar-button"
-          className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors flex items-center space-x-3 shadow-lg cursor-pointer z-10"
-        >
-          <Box size={16} strokeWidth={1.5} />
-          <span>View in my space</span>
-        </button>
-      </ModelViewer>
+        <Box size={16} strokeWidth={1.5} />
+        <span>View in my space</span>
+      </button>
 
       {/* Drag hint */}
       <AnimatePresence>
@@ -74,7 +85,7 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 2, duration: 1 }}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-20"
+            className="absolute bottom-24 left-1/2 -translate-x-1/2 pointer-events-none z-20"
           >
             <p className="text-xs uppercase tracking-widest opacity-40 font-sans">
               Drag to rotate
