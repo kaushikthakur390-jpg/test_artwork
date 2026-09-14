@@ -1,137 +1,72 @@
 "use client";
 
-import { Suspense, useRef, useState, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment, ContactShadows, Html, useProgress } from "@react-three/drei";
-import * as THREE from "three";
+import { useEffect, useState } from "react";
+import { Box } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2 } from "lucide-react";
-
-function Loader() {
-  const { progress } = useProgress();
-  return (
-    <Html center>
-      <div className="flex flex-col items-center text-charcoal">
-        <Loader2 className="animate-spin mb-4 opacity-50" size={24} strokeWidth={1} />
-        <span className="text-xs tracking-widest uppercase opacity-50 font-sans">
-          {progress.toFixed(0)}%
-        </span>
-      </div>
-    </Html>
-  );
-}
-
-function Model({ url }: { url: string }) {
-  const { scene } = useGLTF(url);
-  const group = useRef<THREE.Group>(null);
-  
-  useEffect(() => {
-    if (scene) {
-      // 1. Calculate original bounding box
-      const box = new THREE.Box3().setFromObject(scene);
-      const size = box.getSize(new THREE.Vector3());
-      const center = box.getCenter(new THREE.Vector3());
-      
-      // 2. Center the object around 0,0,0
-      scene.position.x = -center.x;
-      scene.position.y = -center.y;
-      scene.position.z = -center.z;
-      
-      // 3. Scale to fit within a 3x3x3 bounding volume (standardizing size)
-      const maxDim = Math.max(size.x, size.y, size.z);
-      if (maxDim > 0) {
-        scene.scale.setScalar(3 / maxDim);
-      }
-      
-      // 4. Update matrices
-      scene.updateMatrixWorld();
-      
-      // 5. Recompute bounding box after scaling and centering
-      const newBox = new THREE.Box3().setFromObject(scene);
-      
-      // 6. Move it up so its bottom sits exactly on the floor (Y=0)
-      scene.position.y -= newBox.min.y;
-    }
-  }, [scene]);
-
-  // Very slow continuous rotation for presentation
-  useFrame(() => {
-    if (group.current) {
-      group.current.rotation.y += 0.001;
-    }
-  });
-
-  return (
-    <group ref={group}>
-      <primitive object={scene} />
-    </group>
-  );
-}
 
 interface SculptureViewerProps {
   modelUrl: string;
 }
 
 export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
+  const [isMounted, setIsMounted] = useState(false);
   const [interacted, setInteracted] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    import("@google/model-viewer").then(() => {
+      setIsMounted(true);
+    });
   }, []);
 
-  if (!mounted) return null;
+  if (!isMounted) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-offwhite">
+        <p className="text-xs tracking-widest uppercase opacity-40 animate-pulse">
+          Loading model…
+        </p>
+      </div>
+    );
+  }
+
+  const ModelViewer = "model-viewer" as any;
 
   return (
-    <div className="relative w-full h-full bg-offwhite cursor-grab active:cursor-grabbing">
-      <Canvas 
-        shadows 
-        camera={{ position: [0, 2, 6], fov: 45 }}
-        dpr={[1, 1.5]}
-        gl={{ antialias: false, powerPreference: "high-performance" }}
+    <div
+      className="relative w-full h-full bg-offwhite"
+      onPointerDown={() => setInteracted(true)}
+    >
+      <ModelViewer
+        src={modelUrl}
+        ar="true"
+        ar-modes="webxr scene-viewer quick-look"
+        camera-controls="true"
+        auto-rotate="true"
+        auto-rotate-delay="0"
+        rotation-per-second="8deg"
+        shadow-intensity="0.6"
+        shadow-softness="1"
+        environment-image="neutral"
+        exposure="1"
+        interaction-prompt="none"
+        style={{
+          width: "100%",
+          height: "100%",
+          backgroundColor: "transparent",
+          "--poster-color": "transparent",
+        }}
+        alt="A 3D model of an artwork"
       >
-        <color attach="background" args={['#f8f8f5']} />
-        
-        {/* Soft, gallery-like lighting */}
-        <ambientLight intensity={0.5} />
-        <directionalLight 
-          position={[5, 10, 5]} 
-          intensity={1} 
-          castShadow 
-          shadow-mapSize={1024}
-        />
-        <directionalLight 
-          position={[-5, 5, -5]} 
-          intensity={0.3} 
-        />
-        
-        <Suspense fallback={<Loader />}>
-          <Model url={modelUrl} />
-          
-          <Environment preset="studio" />
-          
-          {/* Subtle ground shadow placed exactly at origin (bottom of model) */}
-          <ContactShadows 
-            position={[0, 0, 0]} 
-            opacity={0.4} 
-            scale={10} 
-            blur={2.5} 
-            far={4} 
-            color="#000000"
-          />
-        </Suspense>
+        {/* AR button — only shows on AR-capable devices */}
+        <button
+          slot="ar-button"
+          className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors flex items-center space-x-3 shadow-lg cursor-pointer z-10"
+        >
+          <Box size={16} strokeWidth={1.5} />
+          <span>View in my space</span>
+        </button>
+      </ModelViewer>
 
-        <OrbitControls 
-          makeDefault
-          enablePan={false}
-          enableZoom={true}
-          minPolarAngle={0}
-          maxPolarAngle={Math.PI / 1.5}
-          onStart={() => setInteracted(true)}
-          dampingFactor={0.05}
-        />
-      </Canvas>
-
+      {/* Drag hint */}
       <AnimatePresence>
         {!interacted && (
           <motion.div
@@ -139,7 +74,7 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 2, duration: 1 }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2 pointer-events-none"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-20"
           >
             <p className="text-xs uppercase tracking-widest opacity-40 font-sans">
               Drag to rotate

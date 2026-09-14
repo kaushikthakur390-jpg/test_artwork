@@ -2,7 +2,6 @@
 
 import { getArtworkById } from "@/lib/data";
 import { SculptureViewer } from "@/components/3d/SculptureViewer";
-import { ModelViewerAR } from "@/components/ar/ModelViewerAR";
 import { Navigation } from "@/components/ui/Navigation";
 import { AnimatedReveal } from "@/components/ui/AnimatedReveal";
 import { EnquiryModal } from "@/components/ui/EnquiryModal";
@@ -24,13 +23,9 @@ export default function SculpturePage() {
           <p className="text-sm opacity-80">{artwork.artist}, {artwork.year}</p>
         </div>
 
-        {/* Left/Top Area - 3D Viewer (Dominant) */}
+        {/* Left/Top Area - 3D Viewer with built-in AR */}
         <div className="w-full md:w-2/3 h-[60vh] md:h-screen relative border-r border-charcoal/10">
           <SculptureViewer modelUrl={artwork.modelUrl!} />
-          {/* AR Button - positioned at bottom center, does NOT overlay the canvas */}
-          <div className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 z-10">
-            <ModelViewerAR modelUrl={artwork.modelUrl!} />
-          </div>
         </div>
 
         {/* Right/Bottom Area - Metadata */}
