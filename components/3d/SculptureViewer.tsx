@@ -58,10 +58,9 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
         }}
         alt="A 3D model of an artwork"
       >
-        {/* AR button — forced to always display using !flex to bypass model-viewer's aggressive hiding */}
         <button
           slot="ar-button"
-          className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors !flex items-center space-x-3 shadow-lg cursor-pointer z-10"
+          className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors flex items-center space-x-3 shadow-lg cursor-pointer z-10"
         >
           <Box size={16} strokeWidth={1.5} />
           <span>View in my space</span>
