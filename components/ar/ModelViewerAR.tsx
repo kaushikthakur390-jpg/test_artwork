@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Box } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -24,27 +24,30 @@ export function ModelViewerAR({ modelUrl, className }: ModelViewerARProps) {
 
   const ModelViewer = 'model-viewer' as any;
 
+  const viewerRef = useRef<any>(null);
+
+  const handleARClick = () => {
+    if (viewerRef.current && viewerRef.current.activateAR) {
+      viewerRef.current.activateAR();
+    }
+  };
+
   return (
-    <div className={cn("relative w-full", className)}>
+    <div className={cn("absolute inset-0 pointer-events-none flex items-end justify-center pb-6 md:pb-12 z-20", className)}>
       <ModelViewer
+        ref={viewerRef}
         src={modelUrl}
         ar="true"
         ar-modes="webxr scene-viewer quick-look"
-        camera-controls="true"
-        disable-zoom="true"
-        auto-rotate="true"
-        shadow-intensity="1"
-        style={{ width: "100%", height: "100%", backgroundColor: "transparent" }}
-        alt="A 3D model of an artwork"
+        style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' }}
+      />
+      <button
+        onClick={handleARClick}
+        className="pointer-events-auto bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors flex items-center space-x-3 shadow-lg"
       >
-        <button
-          slot="ar-button"
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors flex items-center space-x-3 shadow-lg"
-        >
-          <Box size={16} strokeWidth={1.5} />
-          <span>View in my space</span>
-        </button>
-      </ModelViewer>
+        <Box size={16} strokeWidth={1.5} />
+        <span>View in my space</span>
+      </button>
     </div>
   );
 }

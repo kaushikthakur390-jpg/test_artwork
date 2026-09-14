@@ -30,7 +30,7 @@ export default function SculpturePage() {
           {/* AR Fallback / Secondary Viewer for Mobile/AR Support */}
           <div className="absolute inset-0 pointer-events-none z-10 flex items-end justify-center pb-6 md:pb-12">
              <div className="pointer-events-auto">
-                <ModelViewerAR modelUrl={artwork.modelUrl!} className="hidden" />
+                <ModelViewerAR modelUrl={artwork.modelUrl!} />
              </div>
           </div>
         </div>
