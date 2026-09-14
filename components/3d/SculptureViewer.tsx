@@ -19,37 +19,6 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
     });
   }, []);
 
-  const handleAR = () => {
-    const ua = navigator.userAgent;
-    const isIOS = /iPhone|iPad|iPod/i.test(ua);
-    const isAndroid = /Android/i.test(ua);
-    const fullModelUrl = new URL(modelUrl, window.location.origin).href;
-
-    if (isIOS) {
-      // iOS Quick Look: create a temporary <a rel="ar"> link with child <img>
-      // This is the native Safari API for launching AR Quick Look
-      const anchor = document.createElement("a");
-      anchor.setAttribute("rel", "ar");
-      anchor.setAttribute("href", fullModelUrl);
-      anchor.style.display = "none";
-      // Quick Look requires a child <img> element to trigger AR mode
-      const img = document.createElement("img");
-      img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-      anchor.appendChild(img);
-      document.body.appendChild(anchor);
-      anchor.click();
-      // Clean up
-      setTimeout(() => document.body.removeChild(anchor), 100);
-    } else if (isAndroid) {
-      // Android Scene Viewer intent
-      const fallback = encodeURIComponent(window.location.href);
-      const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(fullModelUrl)}&mode=ar_preferred#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;S.browser_fallback_url=${fallback};end;`;
-      window.location.href = intentUrl;
-    } else {
-      alert("AR viewing is available on mobile devices. Please open this page on your phone.");
-    }
-  };
-
   if (!isMounted) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-offwhite">
@@ -70,6 +39,8 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
     >
       <ModelViewer
         src={modelUrl}
+        ar="true"
+        ar-modes="webxr scene-viewer quick-look"
         camera-controls="true"
         auto-rotate="true"
         auto-rotate-delay="0"
@@ -86,16 +57,16 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
           "--poster-color": "transparent",
         }}
         alt="A 3D model of an artwork"
-      />
-
-      {/* AR button — always visible, uses native platform AR APIs */}
-      <button
-        onClick={handleAR}
-        className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors flex items-center space-x-3 shadow-lg cursor-pointer z-10"
       >
-        <Box size={16} strokeWidth={1.5} />
-        <span>View in my space</span>
-      </button>
+        {/* AR button — forced to always display using !flex to bypass model-viewer's aggressive hiding */}
+        <button
+          slot="ar-button"
+          className="absolute bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 bg-charcoal text-offwhite px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-charcoal/90 transition-colors !flex items-center space-x-3 shadow-lg cursor-pointer z-10"
+        >
+          <Box size={16} strokeWidth={1.5} />
+          <span>View in my space</span>
+        </button>
+      </ModelViewer>
 
       {/* Drag hint */}
       <AnimatePresence>
