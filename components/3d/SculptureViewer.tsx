@@ -55,7 +55,12 @@ export function SculptureViewer({ modelUrl }: SculptureViewerProps) {
 
   return (
     <div className="relative w-full h-full bg-offwhite cursor-grab active:cursor-grabbing">
-      <Canvas shadows camera={{ position: [0, 2, 6], fov: 45 }}>
+      <Canvas 
+        shadows 
+        camera={{ position: [0, 2, 6], fov: 45 }}
+        dpr={[1, 1.5]}
+        gl={{ antialias: false, powerPreference: "high-performance" }}
+      >
         <color attach="background" args={['#f8f8f5']} />
         
         {/* Soft, gallery-like lighting */}

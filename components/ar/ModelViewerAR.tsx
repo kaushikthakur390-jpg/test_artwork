@@ -39,6 +39,7 @@ export function ModelViewerAR({ modelUrl, className }: ModelViewerARProps) {
         src={modelUrl}
         ar="true"
         ar-modes="webxr scene-viewer quick-look"
+        reveal="manual"
         style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' }}
       />
       <button
